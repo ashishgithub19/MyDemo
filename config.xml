@@ -1,0 +1,5 @@
+<rest-api xmlns="http://marklogic.com/rest-api">
+  <name>RESTdemo</name>
+  <database>restDemoDB</database>
+  <port>8005</port>
+</rest-api>

@@ -1,0 +1,9 @@
+ <person id="1">
+   <name>Michael Bell</name>
+   <gender>Male</gender>
+   <dob>1975-02-01</dob>
+   <f_name>Roger Bell</f_name>
+   <phone_no>998765</phone_no>
+    <std>4</std>
+    <address>Newyork</address>
+  </person>

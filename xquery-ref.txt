@@ -1,0 +1,346 @@
+Xquery
+===========================
+1. Prolog
+
+i. XQuery Dialects 
+
+Strict :
+ xquery version "1.0";
+
+Enhanced : 
+ xquery version "1.0-ml";
+ 
+deprecated :
+xquery version "0.9-ml";  
+
+
+
+ii. module namespace (if lib module)
+
+module namespace custom-function = "http://myorg.com/custom-function";
+
+iii. Import segment :
+import module namespace search = "http://marklogic.com/appservices/search"  at "/MarkLogic/appservices/search/search.xqy";
+
+iv. Namespace declaration :
+declare namespace  hcl = "http://www.hcl.com/emp/";
+
+v. Declare variables :
+
+declare variable $COOUNT := 0;
+
+2. Functional Mapping
+Function mapping is equivalent to iterating over the sequence like it was in a for clause
+by default true in "1.0-ml";
+
+declare option xdmp:mapping "true";
+
+declare function local:print-word ($word as xs:string) { $word };
+local:print-word( ("ram","sita" ))
+
+3. try/catch
+
+try {
+     let $filename := "/Desktop/myfile.xml"
+     let $options := <options xmlns="xdmp:document-load">
+                         <uri>/student.xml</uri>
+                         <repair>none</repair>
+                      </options>
+     return xdmp:document-load($filename, $options)
+     }
+catch ($exception) {
+"Problem loading file, received the following exception: ",
+$exception }
+
+Note: XDMP-CANCELED, SVC-CANCELED, and XDMP-DISABLED 
+
+4. Semi-Colon as Transaction Separator
+
+let $xml := <res><name>Geeta</name></res>
+return xdmp:document-insert("/mydemo/geeta.xml",$xml,(),())
+
+;
+fn:doc("/mydemo/geeta.xml")
+
+5. Private function and variables
+
+declare private function ....
+declare private variable ....
+
+6. Imp Operators :
+
+i. simple map  PathExpr1 ! PathExpr2
+
+xquery version "1.0-ml";
+let $nodes := (
+  <student><name>Ram</name></student>,
+  <student><name>Tom</name></student>,
+  <student><name>Geeta</name></student>
+)
+return $nodes/name ! fn:concat("IIT Delhi : ", .)
+
+ii. String Concatenation Operator "||"
+
+"India " || "is my " || "country"
+
+iii. Named Function References (overloading)
+
+xquery version "1.0-ml";
+declare function local:getCal(
+  $a as xs:int, $b as xs:int
+) as xs:int 
+{  $a + $b };
+
+declare function local:getCal(
+  $a as xs:int, $b as xs:int, $c as xs:int
+) as xs:int 
+{ $a * $b * $c };
+
+
+let $ref := local:doSomething#3
+return $ref(2,3,4)
+
+iv. Function Annotations
+declare %private my:func($p as xs:int) 
+
+v. Dynamic Function Invocation
+
+xquery version "1.0-ml";
+
+let $ref := fn:concat#3
+let $ref1 := fn:concat#2
+return ($ref("a","b","c"), $ref1("a","b"))
+
+
+7. SwitchCase
+xquery version "1.0-ml";
+let $some-value := "1"
+return switch($some-value)
+  case 1 return "Red"
+  case 2 return "Green"
+  case 3 return "Blue"
+  case 4 return "Yellow"
+  default return "White"
+  
+8. typeSwitch
+
+let $x:= doc("/data.xml")/node()
+return
+typeswitch ( $x )
+ case element() return "xml element node"
+ case text() return "text node"
+ case binary() return "binary node"
+default return "don't know"
+
+9. External Variables
+
+ declare variable $exv as xs:string := "my default value";
+ 
+10. Element construction (XQuery + XML )
+i.
+<date>{fn:current-dateTime()}</date>
+
+ii. 
+element employee { 
+      attribute id { "1" } , 
+      element name {"Ram"},
+      element class {
+               attribute class_id { "101" },
+                "10th"},
+      element email_id {"ram@gmail.com"}        
+     }
+	 
+11. XQuery Modules : Main Module and Library Module
+
+Main Module :
+
+xquery version "1.0-ml";
+"hello world"
+
+
+Library Module
+
+xquery version "1.0-ml";
+module namespace my-library="my.library.uri" ;
+
+declare function my-library:callMe()
+{
+"hello"
+};
+ my-library:callMe()
+
+ 
+ 12. XQuery Prolog 
+ 
+Importing Modules or Schemas
+Declaring Namespaces
+Declaring Options
+Declaring Functions
+Declaring Variables
+Declaring a Default Collation
+
+
+import module namespace my-library="my.library.uri" at "hello.xqy";
+import schema namespace xhtml="http://www.w3.org/1999/xhtml"  at "xhtml1.1.xsd";
+
+declare namespace my-namespace="my.namespace.uri";
+
+declare option xdmp:mapping "false";
+
+declare function simple($input as xs:string) as xs:string* {
+   fn:concat('The string "', $input, '" is ', 
+             (fn:string-length($input)), 
+             ' characters in length.')
+} ;
+
+declare variable $COUNT  := 0;
+
+declare default collation "http://marklogic.com/collation/";
+
+13. XQuery Comments 
+(: :)
+
+14.
+some/every
+let $empDoc:= <res>  
+            <emp>
+              <name>Ram</name>
+              <add>Pune</add>
+            </emp>
+            <emp>
+              <name>Shyam</name>
+              <add>Hyderabad</add>
+            </emp>
+            <emp>
+              <name>Geeta</name>
+              <add>
+              <first_add>Pune</first_add>
+              <second_add>Delhi</second_add>
+              </add>
+            </emp>
+             <emp>
+              <name>Sita</name>
+              <add>
+              <first_add>Chennai</first_add>
+              <second_add>Delhi</second_add>
+              </add>
+            </emp>
+        </res>
+
+for $eachEmp in $empDoc/emp
+where some $emp in $eachEmp/add satisfies $emp/first_add
+return
+ $eachEmp
+ 
+15. XQuery Operator
+
+i. Node Comparison Operators
+
+a) Node before/after ( <</ >> )
+let $xml :=</student>
+<name>Raj</name>
+<f_name>Vikas</f_name>
+</student>
+return
+($xml/name << $xml/f_name, $xml/f_name << $xml/name)
+
+b) is :  node is the exact same node as another
+
+let $xml := <student>
+            <name>Raj</name>
+            <f_name>Vikas</f_name>
+          </student>
+return
+($xml/name is $xml/name, $xml/f_name is $xml/name)
+
+ii. Sequence and Item Operator
+= , < , >,  !=
+
+1 = 1 => true
+1 = (1, 2) => true
+(0, 3) = (1, 2) => false
+
+Item Operators
+eq, ne, gt, lt , ge, le, ne
+ 
+
+16. String Functions
+i. fn:string-join 
+
+fn:string-join(("hello", "goodbye"), " and ") 
+
+let $myString := for $each in (1 to 10)
+                  return xs:string($each)
+return fn:string-join( $myString,",")
+
+ii. fn:string-length  => fn:string-length("I am Indian")  => 11
+iii. fn:substring-after => fn:substring-after("I live in Pune but I am from Delhi","but") 
+iv. fn:substring-before => fn:substring-before("I live in Pune but I am from Delhi","but")
+v. fn:tokenize => fn:tokenize("I live in pune ,but I am from Delhi,where do my job",",")
+vi. fn:normalize-space => fn:normalize-space("I live in pune    but I am from Delhi")
+vii. fn:matches => fn:matches("Amit is a Singer", "Singer") => true/false
+viii. fn:contains => fn:contains("Amit is a Singer", "Sing") => true/false
+ix. fn:concat =>  
+				let $country := "India"
+				return
+				fn:concat("Rohan lives in ",  $country )
+
+ 
+
+
+17. Type cast functions
+xs:string(), xs:integer(), xs:date(), xs:boolean()
+
+18. Imp functions
+
+i. fn:base-uri() 
+
+for $x in xdmp:directory("/myDirectory/", "1")
+return base-uri($x)
+
+ii. fn:local-name
+let $x := <result/>
+return fn:local-name($x)
+
+
+Misc
+declare default element namespace "http://www.w3.org/1999/xhtml";
+
+ FLWOR :
+ 
+ let $xml :=
+<employee>
+  <emp id="1">
+   <name >Ram</name>
+   <phone_no>987543210</phone_no>
+    <salary>50000</salary>
+    <address>
+       <ofc_add>Pune</ofc_add>
+       <home_add>Delhi</home_add>
+    </address>
+  </emp>
+  <emp id="2">
+   <name>Mohan</name>
+   <phone_no>887543210</phone_no>
+    <salary>60000</salary>
+    <address>
+       <ofc_add>Pune</ofc_add>
+       <home_add>Hyderabad</home_add>
+    </address>
+</emp>
+</employee>
+
+for $each in $xml/emp 
+where $each/salary > 1000
+order by $each/name  
+return $each
+
+==========
+Node operations
+
+Update:
+xdmp:node-delete
+xdmp:node-insert-after
+xdmp:node-insert-before
+xdmp:node-insert-child
+xdmp:node-replace

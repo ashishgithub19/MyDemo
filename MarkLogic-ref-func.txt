@@ -1,0 +1,111 @@
+1. Collations:
+
+A collation specifies the order for sorting strings.
+collations determine uniqueness in string comparisons, so two strings that are equal according to one collation might be not be equal according to another.
+
+ For example, a code point sort puts all uppercase letters before lower-case letters, so the word Zounds sorts before the word abracadabra.
+ If you use a collation that sorts upper and lower-case letters together (for example, the order A a B b C c, and so on), then abracadabra sorts before Zounds.
+ 
+ 
+The following are two very common collation URIs used in MarkLogic Server:
+
+http://marklogic.com/collation/
+http://marklogic.com/collation/codepoint
+
+
+Ref: https://docs.marklogic.com/guide/search-dev/encodings_collations#
+
+English	
+http://marklogic.com/collation/en  case/diacritic sensitive
+http://marklogic.com/collation/en/S1  case/diacritic insensitive
+http://marklogic.com/collation/en/S2  diacritic sensitive
+http://marklogic.com/collation/en/S1/EO case sensitive
+
+
+Example:
+(: declare default collation "http://marklogic.com/collation//S2/MO"; :)
+let $xml :=
+<employee>
+  <emp id="1">
+   <name >Ram</name>
+   <phone_no>987543210</phone_no>
+    <salary>1010</salary>
+    <grade>1</grade>
+  </emp>
+  <emp id="2">
+   <name>Mohan</name>
+   <phone_no>887543210</phone_no>
+    <salary>60000</salary>
+    <grade>99</grade>
+  </emp>
+  <emp id="3">
+     <name>Mohan</name>
+     <phone_no>887543210</phone_no>
+      <salary>60000</salary>
+      <grade>100</grade>
+  </emp>
+</employee>
+for $eachEmp in $xml/emp 
+order by $eachEmp/grade  collation "http://marklogic.com/collation//S2/MO" 
+return $eachEmp
+
+
+
+
+=====================================================================
+MarLogic Specific Functions:
+
+1. xdmp:eval()  =>  evaluates the XQuery as string, run against the other database.
+i. insert into other db
+  let $xml:= <emp id="1">
+   <name >Ram</name>
+   <phone_no>987543210</phone_no>
+    <salary>50000</salary>
+    <address>
+       <ofc_add>Pune</ofc_add>
+       <home_add>Delhi</home_add>
+    </address>
+  </emp>
+  return xdmp:document-insert("/emp/1.xml",$xml,(),"EMP") 
+
+ ii.
+let $empId := "1"
+let $query := 'xquery version "1.0-ml";
+               declare variable $empId as xs:string external;
+               
+               fn:collection("EMP")/emp[@id[.=$empId]]
+              '
+ return xdmp:eval($query, (xs:QName("empId"),$empId),
+                         <options  xmlns="xdmp:eval">
+                           <database>{xdmp:database("demo-db")}</database>
+                         </options>
+                           )
+						   
+2. xdmp:invoke() => https://docs.marklogic.com/xdmp:invoke
+
+3. xdmp:spawn() =>
+
+ xdmp:spawn("/scheduled/my_task.xqy", (),
+        <options xmlns="xdmp:eval">
+          <modules>{xdmp:database("hcl-demo")}</modules>
+         </options>)
+
+		 
+4. fn:data() vs  text()
+
+let $xml := <res><name>Ram <surname>Gupta</surname></name></res>
+return $xml/fn:data(name) / $xml/name/text()
+
+let $textDoc := 
+text { "MarkLogic is as NoSql Database" }
+  return xdmp:document-insert("/text-doc.txt",$textDoc )
+
+
+curl -X POST --anyauth --user admin:admin -d @"./config.xml" ^
+    -H "Content-type: application/xml" ^
+    http://localhost:8002/LATEST/rest-apis
+	
+	
+	curl -X GET --anyauth --user admin:admin ^
+    -H "Accept: application/json" ^
+    http://localhost:8002/LATEST/rest-apis

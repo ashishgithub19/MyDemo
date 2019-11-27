@@ -1,0 +1,29 @@
+Triggers and Schema
+====================================
+Type:
+Pre-commit 
+Post-commit
+
+i. Create Triggersxquery version "1.0-ml";
+
+import module namespace trgr="http://marklogic.com/xdmp/triggers"  at "/MarkLogic/triggers.xqy";
+
+trgr:create-trigger("myTrigger", "Simple trigger example", 
+  trgr:trigger-data-event(
+      trgr:directory-scope("/myDemoDir/", "1"),
+      trgr:document-content("create"),
+      trgr:post-commit()),
+  trgr:trigger-module(xdmp:database("hcl-demo"), "/modules/", "add_element.xqy"),
+  fn:true(), xdmp:default-permissions() )
+  
+  (: 1940870681066238651 :)
+  
+ii. Insert add_element.xqy file
+
+ let $doc := xdmp:document-get("C:\Users\NAME\Desktop\upload-hcl\demo\add_element.xqy")
+ return xdmp:document-insert("/modules/add_element.xqy",$doc,(),())
+ 
+iii. insert document 
+
+ let $doc := xdmp:document-get("C:\Users\NAME\Desktop\myXml.xml")
+ return xdmp:document-insert("/myDemoDir/myXml.xml",$doc,(),())

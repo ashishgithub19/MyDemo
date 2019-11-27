@@ -1,0 +1,40 @@
+MarkLogic Indexing 
+========================
+1. Type of Indexes
+i.Element range index => A range index on an XML element or JSON property.
+ii.Attribute range index =>	A range index on an attribute in an XML element.
+iii.Path range index =>	A range index on an XML element, XML attribute, or JSON property as defined by an XPath expression.
+iv.Field range index => A range index on a field. For details, see Fields Database Settings.
+
+2. Using Range Indexes for Value Lexicons
+
+These are queries that use the following search APIs:
+cts:values
+cts:value-match
+cts:element-attribute-values
+cts:element-attribute-value-match
+cts:element-values
+cts:element-value-match
+cts:field-values
+cts:field-value-match
+
+3.To use a word lexicon, use the following search APIs
+
+cts:element-attribute-words
+cts:element-attribute-word-match
+cts:element-words
+cts:element-word-match
+cts:field-words
+cts:field-word-match
+cts:json-property-words
+cts:json-property-word-match
+
+4. Path Range Indexes
+
+5. Field Indexes
+
+ cts:field-word-query, cts:field-value-query, cts:field-range-query, cts:field-words, and cts:field-word-match
+
+
+
+Database property "diacratic , sensitive searh"

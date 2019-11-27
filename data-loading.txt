@@ -1,0 +1,135 @@
+Data Model And Loading
+====================
+1. Supported Format:
+
+i. XML
+
+<student id="1">
+	<name>Tom Alter</name>
+	<gender>Male</gender>
+	<dob>2000-02-01</dob>
+	<f_name>Jhon Alter</f_name>
+	<phone_no>987543210</phone_no>
+	<std>4</std>
+	<address>Chennai</address>
+	<description>
+		Tom is very good in academics. He is football player.
+	</description>
+</student>
+
+ii.Json
+
+{"student":[{"id":"1",
+			"name":"Tom Alter",
+			"gender":"Male",
+			"dob":"2000-02-01", 
+			"f_name":"Jhon Alter", 
+			"phone_no":"987543210", 
+			"std":"4",
+			"address":"Chennai",
+			"description":"Tom is very good in academics. He is football player."}
+			]}
+			
+iii. Text
+
+iv. Binary (Images, Excel , PDF etc..)			
+
+2. MIME Type 
+
+3. Considerations Before Loading Content
+
+i. Setting Document Permissions
+ii.Schemas
+iii.Fragments
+iv. Indexing
+v. UTF-8 Encoding
+
+ 
+
+4. Data Loading Methods
+
+i. Admin Screen => Go to Database and clike on Load button.
+
+ii. MarkLogic Function
+xdmp:document-load("C:\Users\Desktop\myXml.xml", 
+          <options xmlns="xdmp:document-load">
+            <uri>/mydocs/myfile.xml</uri> 
+            <permissions>{xdmp:default-permissions()}</permissions> 
+            <format>xml</format>
+			        <encoding>ISO-8859-1</encoding>
+          </options>)
+		  
+ xquery version "1.0-ml";
+ declare namespace dir="http://marklogic.com/xdmp/directory";
+ for $eachDoc in  xdmp:filesystem-directory("C:\Users\Desktop\ML-tutorials\demo\data\claims")/dir:entry
+ let $fileUri := $eachDoc/dir:filename/text()
+ let $pathname := $eachDoc/dir:pathname/text()
+ return 
+
+xdmp:document-load($pathname, 
+          <options xmlns="xdmp:document-load">
+            <uri>{fn:concat("/MyDir/",$fileUri)}</uri> 
+            <permissions>{xdmp:default-permissions()}</permissions> 
+            <format>xml</format>
+			        <encoding>ISO-8859-1</encoding>
+          </options>)
+		  
+ref : https://docs.marklogic.com/xdmp:document-load
+OR
+ let $doc := xdmp:document-get("C:\Users\NAME\Desktop\myXml.xml")
+ return xdmp:document-insert("/mydocs/myfile.xml",$doc,(),())
+ 
+		  
+iii. REST APIs
+iv. WebDav client
+
+v. MLCP Tool
+
+Import :
+mlcp.bat import -host localhost -port 8000 -database demo ^
+-username admin -password admin -input_file_type documents ^
+-document_type mixed -input_file_path C:\Users\NAME\Desktop\data\student ^
+-output_uri_replace "^(.*data),''" -thread_count 8 mou
+
+mlcp.bat import -host localhost -port 8000 -database demo ^
+-username admin -password admin -input_file_type documents ^
+-document_type mixed -input_file_path C:\Users\NAME\Desktop\data\results ^
+-output_uri_replace "^(.*data),''" -thread_count 8
+
+Export :
+i. 
+ mlcp.bat export -host localhost -port 8000 -database demo ^
+-username admin -password admin -mode local ^
+-output_file_path   C:\Users\NAME\Desktop\myData\Import -collection_filter Student
+
+ii.
+mlcp.bat export -host localhost -port 8000 -database demo ^
+-username admin -password admin -mode local ^
+-output_file_path C:\Users\NAME\Desktop\myData\Import -collection_filter Student -compress true
+
+5. Loading diff docs
+xdmp:tidy converts HTML to XHTML
+xdmp:pdf-convert converts a PDF file to XHTML
+xdmp:excel-convert converts a Microsoft Excel document to XHTML
+
+========================================
+Log-Files
+========================================
+i. Levels :Finest,Finer,Fine,Debug,Config,Info, Notice,Warning, Error, Critical, Alert, Emergency
+
+ii. locations
+
+Microsoft Windows	
+C:\Program Files\MarkLogic\Data\Logs\ErrorLog.txt
+C:\Program Files\MarkLogic\Data\Logs\<port>_ErrorLog.txt
+
+Red Hat Enterprise Linux	
+/var/opt/MarkLogic/Logs/ErrorLog.txt
+/var/opt/MarkLogic/Logs/<port>_ErrorLog.txt
+
+Mac OS X	
+~/Library/Application Support/MarkLogic/Data/Logs/ErrorLog.txt
+~/Library/Application Support/MarkLogic/Data/Logs/<port>_ErrorLog.txt
+
+iii. 
+xdmp:log("Hello : My logs","notice")

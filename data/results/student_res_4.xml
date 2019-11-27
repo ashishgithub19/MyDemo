@@ -1,0 +1,8 @@
+ <student_result id="4">
+   <marks subject="Maths">90</marks>
+   <marks subject="Science">99</marks>
+   <marks subject="English">92</marks>
+   <marks subject="Hindi">98</marks>
+   <marks subject="History">98</marks>
+   <code>A</code>
+  </student_result>
